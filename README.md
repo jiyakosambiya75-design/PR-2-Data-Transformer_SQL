@@ -91,8 +91,3 @@ Use code with caution.
 📝 License
 
 Distributed under the open-source MIT License 📄. You are completely free to fork, reshape, scale, and optimize this code for personal growth or professional enterprise builds!
-If you want to keep enhancing this project, let me know:
-• Do you want to bundle this into a ready-to-run .md file generator script?
-• Should we design an Entity-Relationship Diagram (ERD) layout using text tools?
-• Would you like to add automated stored procedures or database triggers to this stack?
-Tell me what you need next, and we will build it!
