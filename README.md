@@ -109,6 +109,9 @@ SOURCE /your/local/repository/path/second_project_queries.sql;
 
 4. Alternatively, open the raw script inside your database terminal window, highlight the entire code block, and hit **Execute Query**! 💥
 
+Explanation video:
+https://drive.google.com/file/d/1RwbmpAF5oqLRl2v8Sfqek2sP2KsyAzAw/view?usp=drivesdk
+
 ---
 
 ## 📝 Open-Source Licensing
