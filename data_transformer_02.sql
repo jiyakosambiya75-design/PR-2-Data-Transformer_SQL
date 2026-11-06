@@ -2,12 +2,13 @@ CREATE DATABASE IF NOT EXISTS second_project;
 
 USE second_project;
 
+-- Creating Customer Table with correct column names from image
 CREATE TABLE customer_table (
-    Customer_ID INT PRIMARY KEY,
-    First_name VARCHAR(50),
-    Second_name VARCHAR(50),
+    CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
     Email VARCHAR(100),
-    Registration_date DATE
+    RegistrationDate DATE
 );
 
 DESC customer_table;
@@ -18,14 +19,13 @@ INSERT INTO customer_table VALUES
 
 SELECT * FROM customer_table;
 
-
+-- Creating Orders Table with correct column names from image
 CREATE TABLE order_table (
-    Order_ID INT PRIMARY KEY,
-    Customer_ID INT,
-    Order_date DATE,
-    Total_Amount DECIMAL(10,2),
-    FOREIGN KEY (Customer_ID)
-    REFERENCES customer_table(Customer_ID)
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10,2),
+    FOREIGN KEY (CustomerID) REFERENCES customer_table(CustomerID)
 );
 
 DESC order_table;
@@ -36,13 +36,13 @@ INSERT INTO order_table VALUES
 
 SELECT * FROM order_table;
 
-
+-- Creating Employees Table with correct column names from image
 CREATE TABLE employee_table (
-    Employee_ID INT PRIMARY KEY,
-    First_name VARCHAR(50),
-    Second_name VARCHAR(50),
+    EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
     Department VARCHAR(100),
-    Hire_date DATE,
+    HireDate DATE,
     Salary DECIMAL(10,2)
 );
 
@@ -55,167 +55,149 @@ INSERT INTO employee_table VALUES
 SELECT * FROM employee_table;
 
 
-SELECT
-c.First_name,
-o.Order_ID,
-o.Total_Amount
+---=================================================
+
+-- 1. INNER JOIN: Retrieve all orders and customer details where orders exist.
+SELECT c.FirstName,o.OrderID,o.TotalAmount
 FROM customer_table AS c
 INNER JOIN order_table AS o
-ON c.Customer_ID = o.Customer_ID;
+ON c.CustomerID = o.CustomerID;
 
-
-SELECT
-c.Customer_ID,
-c.First_name,
-o.Order_ID,
-o.Total_Amount
+-- 2. LEFT JOIN: Retrieve all customers and their corresponding orders (if any).
+SELECT c.CustomerID,
+c.FirstName,
+o.OrderID,
+o.TotalAmount
 FROM customer_table AS c
 LEFT JOIN order_table AS o
-ON c.Customer_ID = o.Customer_ID;
+ON c.CustomerID = o.CustomerID;
 
-
-SELECT
-c.Customer_ID,
-c.First_name,
-c.Second_name,
-o.Order_ID,
-o.Total_Amount
+-- 3. RIGHT JOIN: Retrieve all orders and their corresponding customers (if any).
+SELECT c.CustomerID,
+c.FirstName,
+c.LastName,
+o.OrderID,
+o.TotalAmount
 FROM customer_table AS c
 RIGHT JOIN order_table AS o
-ON c.Customer_ID = o.Customer_ID;
+ON c.CustomerID = o.CustomerID;
 
-
-SELECT
-c.Customer_ID,
-c.First_name,
-c.Second_name,
-o.Order_ID,
-o.Total_Amount
+-- 4. FULL OUTER JOIN: Retrieve all customers and all orders, regardless of matching.
+SELECT c.CustomerID,
+c.FirstName,
+c.LastName,
+o.OrderID,
+o.TotalAmount
 FROM customer_table AS c
 LEFT JOIN order_table AS o
-ON c.Customer_ID = o.Customer_ID
-
+ON c.CustomerID = o.CustomerID
+    
 UNION
-
-SELECT
-c.Customer_ID,
-c.First_name,
-c.Second_name,
-o.Order_ID,
-o.Total_Amount
+    
+SELECT c.CustomerID,
+c.FirstName,
+c.LastName,
+o.OrderID,
+o.TotalAmount
 FROM customer_table AS c
 RIGHT JOIN order_table AS o
-ON c.Customer_ID = o.Customer_ID;
+ON c.CustomerID = o.CustomerID;
 
-
-SELECT DISTINCT
-c.Customer_ID,
-c.First_name,
-c.Second_name,
-o.Total_Amount
+-- 5. Subquery to find customers who have placed orders worth more than the average amount.
+SELECT DISTINCT c.CustomerID,
+c.FirstName,
+c.LastName,
+o.TotalAmount
 FROM customer_table AS c
 INNER JOIN order_table AS o
-ON c.Customer_ID = o.Customer_ID
-WHERE o.Total_Amount > (
-    SELECT AVG(Total_Amount)
-    FROM order_table
+ON c.CustomerID = o.CustomerID
+WHERE o.TotalAmount > (SELECT AVG(TotalAmount)
+FROM order_table
 );
 
-
+-- 6. Subquery to find employees with salaries above the average salary.
 SELECT DISTINCT
-e.Employee_ID,
-e.First_name,
-e.Second_name,
+e.EmployeeID,
+e.FirstName,
+e.LastName,
 e.Salary
 FROM employee_table AS e
-WHERE e.Salary > (
-    SELECT AVG(Salary)
-    FROM employee_table
+WHERE e.Salary > (SELECT AVG(Salary)
+FROM employee_table
 );
 
-
+-- 7. Extract the year and month from the OrderDate.
 SELECT
-Order_ID,
-Order_date,
-YEAR(Order_date) AS Order_year,
-MONTH(Order_date) AS Order_month
+OrderID,
+OrderDate,
+YEAR(OrderDate) AS Order_year,
+MONTH(OrderDate) AS Order_month
 FROM order_table;
 
-
+-- 8. Calculate the difference in days between two dates (order date and current date).
 SELECT
-Order_ID,
-Customer_ID,
-Order_date,
-DATEDIFF(CURRENT_DATE, Order_date) AS Date_difference
+OrderID,
+CustomerID,
+OrderDate,
+DATEDIFF(CURRENT_DATE, OrderDate) AS Date_difference
 FROM order_table;
 
-
-SELECT
-Order_ID,
-Order_date,
-DATE_FORMAT(Order_date, '%d-%m-%Y') AS Formatted_date
+-- 9. Format the OrderDate to a more readable format (e.g., 'DD-MMM-YYYY').
+SELECT OrderID , OrderDate,
+DATE_FORMAT(OrderDate, '%d-%b-%Y') AS Formatted_date
 FROM order_table;
 
-
+-- 10. Concatenate FirstName and LastName to form a full name.
 SELECT
-Employee_ID,
-First_name,
-Second_name,
-CONCAT(First_name, ' ', Second_name) AS Full_name
+EmployeeID,
+FirstName,
+LastName,
+CONCAT(FirstName, ' ', LastName) AS Full_name
 FROM employee_table;
 
-
+-- 11. Replace part of a string (e.g., replace 'John' with 'Jonathan').
 SELECT
-First_name,
-REPLACE(First_name, 'John', 'Jonathan') AS Updated_name
+FirstName,
+REPLACE(FirstName, 'John', 'Jonathan') AS Updated_name
 FROM customer_table;
 
-
+-- 12. Convert FirstName to uppercase and LastName to lowercase.
 SELECT
-First_name,
-Second_name,
-UPPER(First_name) AS Upper_firstname,
-LOWER(Second_name) AS Lower_secondname
+FirstName,
+LastName,
+UPPER(FirstName) AS Upper_firstname,
+LOWER(LastName) AS Lower_lastname
 FROM customer_table;
 
-
+-- 13. Trim extra spaces from the Email field.
 SELECT
 Email,
 TRIM(Email) AS Trimmed_email
 FROM customer_table;
 
-
-SELECT
-Order_ID,
-Total_Amount,
-SUM(Total_Amount) OVER (
-    ORDER BY Order_ID
-) AS Running_total
+-- 14. Calculate the running total of TotalAmount for each order.
+SELECT OrderID , TotalAmount ,
+SUM(TotalAmount) OVER (ORDER BY OrderID) AS Running_total
 FROM order_table;
 
-
-SELECT
-Order_ID,
-Total_Amount,
-RANK() OVER (
-    ORDER BY Total_Amount
-) AS Order_rank
+-- 15. Rank orders based on TotalAmount using the RANK() function.
+SELECT OrderID , TotalAmount,
+RANK() OVER (ORDER BY TotalAmount) AS Order_rank
 FROM order_table;
 
-
-SELECT
-Order_ID,
-Total_Amount,
+-- 16. Assign a discount based on TotalAmount in orders (e.g., > 1000: 10% off, > 500: 5% off).
+SELECT OrderID,
+TotalAmount,
 CASE
-    WHEN Total_Amount > 1000 THEN '10% Discount'
-    WHEN Total_Amount > 500 THEN '5% Discount'
+    WHEN TotalAmount > 1000 THEN '10% Discount'
+    WHEN TotalAmount > 500 THEN '5% Discount'
     ELSE 'No Discount'
 END AS Discount
 FROM order_table;
 
-
+-- 17. Categorize employees' salaries as high, medium, or low.
 SELECT
-Employee_ID,
+EmployeeID,
 Salary,
 CASE
     WHEN Salary > 55000 THEN 'HIGH'
@@ -223,4 +205,4 @@ CASE
     ELSE 'LOW'
 END AS Categorized_employees
 FROM employee_table
-ORDER BY Employee_ID;
+ORDER BY EmployeeID;
